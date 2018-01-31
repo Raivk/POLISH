@@ -39,6 +39,14 @@ public class GameManager : MonoBehaviour {
 		
 	}
 
+    public void CollectCoin()
+    {
+        if (m_Rating)
+            return;
+
+        m_Levels[currentLevel].CollectCoin();
+    }
+
     public void NextLevel(int rating)
     {
         if (m_Rating)
@@ -50,7 +58,7 @@ public class GameManager : MonoBehaviour {
 
             if(currentLevel >= m_MinimumPolishLevel)
             {
-                m_PlayerController.m_PolishLevel++;
+                m_PlayerController.Polish();
             }
 
             Level current = m_Levels[currentLevel];

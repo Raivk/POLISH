@@ -10,6 +10,9 @@ public class Level : MonoBehaviour {
     public TextMeshPro m_ReactText;
     public TextMeshPro m_Text;
 
+    public GameObject[] m_Door;
+    public int m_Coins;
+
     public float m_WriteSpeed;
 
     IEnumerator TextWriterReact(string text, TextMeshPro tmp)
@@ -44,6 +47,18 @@ public class Level : MonoBehaviour {
         } else
         {
             StartCoroutine(TextWriter(text, tmp));
+        }
+    }
+
+    public void CollectCoin()
+    {
+        m_Coins--;
+        if(m_Coins <= 0)
+        {
+            foreach(GameObject door in m_Door)
+            {
+                door.SetActive(false);
+            }
         }
     }
 
