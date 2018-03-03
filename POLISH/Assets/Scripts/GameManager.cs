@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour {
 
-    private int currentLevel = 0;
+    public int currentLevel = 0;
     public Level[] m_Levels;
 
     public Level m_RatingRoom;
@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour {
     public PlayerController m_PlayerController;
 
     public int m_MinimumPolishLevel;
+
+    public List<int> m_Notations = new List<int>();
 
     public void Awake()
     {
@@ -29,16 +31,6 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     public void CollectCoin()
     {
         if (m_Rating)
@@ -49,72 +41,90 @@ public class GameManager : MonoBehaviour {
 
     public void NextLevel(int rating)
     {
-        if (m_Rating)
+        if(currentLevel < m_MinimumPolishLevel)
         {
             currentLevel++;
 
             if (currentLevel >= m_Levels.Length)
                 return;
 
-            if(currentLevel >= m_MinimumPolishLevel)
-            {
-                m_PlayerController.Polish();
-            }
-
             Level current = m_Levels[currentLevel];
 
             current.gameObject.SetActive(true);
 
             m_PlayerController.transform.position = new Vector3(current.m_Start.position.x, current.m_Start.position.y, m_PlayerController.transform.position.z);
-            
-            string txt = "";
-            switch (rating)
-            {
-                case 0:
-                    txt = "0 ?! That's REALLY harsh !";
-                    break;
-                case 1:
-                    txt = "Well... it's... a rating.";
-                    break;
-                case 2:
-                    txt = "2... At least it's honest !";
-                    break;
-                case 3:
-                    txt = "3 is almots 5 !";
-                    break;
-                case 4:
-                    txt = "So close to 5. SO CLOSE.";
-                    break;
-                case 5:
-                    txt = "WOOT ! It's almost good, isn't it ?";
-                    break;
-                case 6:
-                    txt = "I knew it would please you.";
-                    break;
-                case 7:
-                    txt = "7 ! You're so kind";
-                    break;
-                case 8:
-                    txt = "I know I know, this game is amazing.";
-                    break;
-                case 9:
-                    txt = "Almost a perfect game.";
-                    break;
-                case 10:
-                    txt = "10 OUT OF 10 MEANS ABSOLUTELY PERFECT !";
-                    break;
-            }
-            current.Write(txt, current.m_ReactText, true);
-        }
-        else
+
+            current.Write(current.m_Text.text, current.m_Text, false);
+        } else
         {
-            m_Levels[currentLevel].gameObject.SetActive(false);
+            if (m_Rating)
+            {
+                currentLevel++;
 
-            m_PlayerController.transform.position = new Vector3(m_RatingRoom.m_Start.position.x, m_RatingRoom.m_Start.position.y, m_PlayerController.transform.position.z);
+                if (currentLevel >= m_Levels.Length)
+                    return;
 
-            m_RatingRoom.Write(m_RatingRoom.m_Text.text, m_RatingRoom.m_Text, false);
+                //Add polish level
+                if (currentLevel >= m_MinimumPolishLevel)
+                {
+                    m_Notations.Add(rating <= 3 ? 1 : (rating <= 6 ? 2 : 3));
+                }
+
+                Level current = m_Levels[currentLevel];
+
+                current.gameObject.SetActive(true);
+
+                m_PlayerController.transform.position = new Vector3(current.m_Start.position.x, current.m_Start.position.y, m_PlayerController.transform.position.z);
+
+                string txt = "";
+                switch (rating)
+                {
+                    case 0:
+                        txt = "0 ?! That's REALLY harsh !";
+                        break;
+                    case 1:
+                        txt = "Well... it's... a rating.";
+                        break;
+                    case 2:
+                        txt = "2... At least it's honest !";
+                        break;
+                    case 3:
+                        txt = "3 is almots 5 !";
+                        break;
+                    case 4:
+                        txt = "So close to 5. SO CLOSE.";
+                        break;
+                    case 5:
+                        txt = "WOOT ! It's almost good, isn't it ?";
+                        break;
+                    case 6:
+                        txt = "I knew it would please you.";
+                        break;
+                    case 7:
+                        txt = "7 ! You're so kind";
+                        break;
+                    case 8:
+                        txt = "I know I know, this game is amazing.";
+                        break;
+                    case 9:
+                        txt = "Almost a perfect game.";
+                        break;
+                    case 10:
+                        txt = "10 OUT OF 10 MEANS ABSOLUTELY PERFECT !";
+                        break;
+                }
+                current.Write(txt, current.m_ReactText, true);
+            }
+            else
+            {
+                m_Levels[currentLevel].gameObject.SetActive(false);
+
+                m_PlayerController.transform.position = new Vector3(m_RatingRoom.m_Start.position.x, m_RatingRoom.m_Start.position.y, m_PlayerController.transform.position.z);
+
+                m_RatingRoom.Write(m_RatingRoom.m_Text.text, m_RatingRoom.m_Text, false);
+            }
+
+            m_Rating = !m_Rating;
         }
-
-        m_Rating = !m_Rating;
     }
 }

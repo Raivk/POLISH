@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerController : MonoBehaviour {
 
@@ -10,18 +11,7 @@ public class PlayerController : MonoBehaviour {
 
     public Rigidbody2D m_Rigidbody;
 
-    public int m_PolishLevel = 0;
-
-    public TrailRenderer m_Trail;
-
-	
-    IEnumerator ResetTrailRenderer(TrailRenderer tr)
-    {
-        float trailTime = tr.time;
-        tr.time = 0;
-        yield return null;
-        tr.time = trailTime;
-    }
+    public UnityEvent m_OnNextLevel;
 
     private void FixedUpdate()
     {
@@ -38,25 +28,13 @@ public class PlayerController : MonoBehaviour {
         m_Rigidbody.AddForce(inputs * m_Speed, ForceMode2D.Impulse);
     }
 
-    public void Polish()
-    {
-        m_PolishLevel++;
-        if(m_PolishLevel == 1)
-        {
-            m_Trail.gameObject.SetActive(true);
-        }
-    }
-
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("End"))
         {
             //SWITCH
-            if(m_PolishLevel >= 1)
-            {
-                StartCoroutine(ResetTrailRenderer(m_Trail));
-            }
             GameManager.instance.NextLevel(collision.gameObject.GetComponent<LevelEnd>().m_Rating);
+            m_OnNextLevel.Invoke();
         }
         if (collision.gameObject.CompareTag("Coin"))
         {
