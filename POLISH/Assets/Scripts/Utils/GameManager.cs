@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class GameManager : MonoBehaviour {
 
@@ -9,7 +10,8 @@ public class GameManager : MonoBehaviour {
 
     public Level m_RatingRoom;
 
-    private bool m_Rating = false;
+    [HideInInspector]
+    public bool m_Rating = false;
 
     public static GameManager instance;
 
@@ -18,6 +20,8 @@ public class GameManager : MonoBehaviour {
     public int m_MinimumPolishLevel;
 
     public List<int> m_Notations = new List<int>();
+
+    public UnityEvent OnLevelChange;
 
     public void Awake()
     {
@@ -31,6 +35,15 @@ public class GameManager : MonoBehaviour {
             Destroy(gameObject);
     }
 
+    public void Start()
+    {
+        foreach(Level l in m_Levels)
+        {
+            l.gameObject.SetActive(false);
+        }
+        m_Levels[0].gameObject.SetActive(true);
+    }
+
     public void CollectCoin()
     {
         if (m_Rating)
@@ -41,6 +54,7 @@ public class GameManager : MonoBehaviour {
 
     public void NextLevel(int rating)
     {
+        m_Levels[currentLevel].gameObject.SetActive(false);
         if(currentLevel < m_MinimumPolishLevel)
         {
             currentLevel++;
@@ -126,5 +140,13 @@ public class GameManager : MonoBehaviour {
 
             m_Rating = !m_Rating;
         }
+
+        OnLevelChange.Invoke();
+    }
+
+    public void Die()
+    {
+        //TP BACK PLAYER TO SPAWN
+        m_PlayerController.Respawn(m_Levels[currentLevel]);
     }
 }

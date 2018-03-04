@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrailController : PolishController {
+public class ParticleSystemController : PolishController
+{
 
-    private TrailRenderer trail;
+    private ParticleSystem pc;
 
     private bool wasEnabled = false;
 
@@ -19,8 +20,8 @@ public class TrailController : PolishController {
 
     public void Start()
     {
-        trail = GetComponent<TrailRenderer>();
-        trail.enabled = false;
+        pc = GetComponent<ParticleSystem>();
+        pc.Stop();
     }
 
     public override void OnEnabledUpdate()
@@ -29,14 +30,7 @@ public class TrailController : PolishController {
         if (!wasEnabled)
         {
             wasEnabled = true;
-            trail.enabled = true;
+            pc.Play();
         }
-    }
-
-    public void Teleport()
-    {
-        if (!isEnabled)
-            return;
-        StartCoroutine(ResetTrailRenderer(trail));
     }
 }

@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 
     public Rigidbody2D m_Rigidbody;
 
-    public UnityEvent m_OnNextLevel;
+    public UnityEvent m_OnTeleport;
 
     private void FixedUpdate()
     {
@@ -25,7 +25,14 @@ public class PlayerController : MonoBehaviour {
     public void HandleMovement()
     {
         Vector2 inputs = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+
         m_Rigidbody.AddForce(inputs * m_Speed, ForceMode2D.Impulse);
+    }
+
+    public void Respawn(Level current)
+    {
+        m_OnTeleport.Invoke();
+        transform.position = new Vector3(current.m_Start.position.x, current.m_Start.position.y, transform.position.z);
     }
 
     public void OnTriggerEnter2D(Collider2D collision)
@@ -34,12 +41,20 @@ public class PlayerController : MonoBehaviour {
         {
             //SWITCH
             GameManager.instance.NextLevel(collision.gameObject.GetComponent<LevelEnd>().m_Rating);
-            m_OnNextLevel.Invoke();
+            m_OnTeleport.Invoke();
         }
         if (collision.gameObject.CompareTag("Coin"))
         {
             Destroy(collision.gameObject);
             GameManager.instance.CollectCoin();
+        }
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Laser"))
+        {
+            GameManager.instance.Die();
         }
     }
 }
